@@ -1,0 +1,21 @@
+body {
+    margin: 0;
+    padding: 0;
+}
+
+.App {
+}
+
+.ChatMessages {
+    overflow-y: scroll;
+    overflow-x: hidden;
+    flex-grow: 1;
+    padding: 20px;   
+    min-height: 500px;
+    max-height: 500px;
+}
+
+.Title {
+    font-family: 'Poiret One', cursive;
+    font-size: 80px;
+}
