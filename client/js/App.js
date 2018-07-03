@@ -1,5 +1,6 @@
 import  React, { Component } from 'react';
 import { Segment, Grid, Header, Label, Button, Form } from 'semantic-ui-react';
+import Room from './Room.js';
 
 class App extends Component {
   constructor(props) {
@@ -54,12 +55,7 @@ class App extends Component {
         <Grid textAlign='center' verticalAlign='middle' style={{ height: '100%' }}>
           <Grid.Column computer={8} mobile={15} tablet={12}>
             <header className='Title'><p>UsTube</p></header>
-            <p>
-              {this.state.userName}
-            </p>
-            <p>
-              {this.state.roomName}
-            </p>
+            <Room userName={this.state.userName} roomName={this.state.roomName} />
           </Grid.Column>
         </Grid>
       );

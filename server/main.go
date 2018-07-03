@@ -75,7 +75,7 @@ func handleConnections(w http.ResponseWriter, r *http.Request) {
 
 		var dataUnmarshalled map[string]interface{}
 		json.Unmarshal(data, &dataUnmarshalled)
-		dataType := dataUnmarshalled["DataType"].(string)
+		dataType := dataUnmarshalled["dataType"].(string)
 
 		// handle based on which type of data is being sent
 		switch dataType {

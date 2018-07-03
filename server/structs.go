@@ -37,8 +37,8 @@ func newRoom(roomname string) Room {
 	return Room{
 		RoomName:           roomname,
 		Clients:            clientsMap,
-		MessageBroadcast:   broadcastQueue,
+		MessageBroadcast:   messageBroadcast,
 		PlayPauseBroadcast: playPauseBroadcast,
-		timelineBroadcast:  timelineBroadcast,
+		TimelineBroadcast:  timelineBroadcast,
 	}
 }
