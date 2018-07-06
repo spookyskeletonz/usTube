@@ -38,8 +38,9 @@ class Room extends Component {
       }));
     } else if (data.DataType === "applySync"){
       console.log("received apply sync");
-      this.state.timeline = data.Timeline;
-      this.state.playPause = data.playPause;
+      this.state.timeline = data.SyncTimeline.Timeline;
+      this.state.playPause = data.SyncPlayPause.PlayPause;
+      this.forceUpdate();
     } else {
       console.log(data["DataType"]);
       return;
@@ -96,8 +97,6 @@ class Room extends Component {
       </div>
     );
   }
-
-
 }
 
 export default Room;

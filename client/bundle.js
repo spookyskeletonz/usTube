@@ -201,6 +201,20 @@ var Room = function (_Component) {
       } else if (data.DataType === "timeline") {
         console.log("received timeline");
         this.state.timeline = data.Timeline;
+      } else if (data.DataType === "requestSync") {
+        console.log("received sync request");
+        this.socket.send(JSON.stringify({
+          dataType: 'sync',
+          userName: this.props.userName,
+          roomName: this.props.roomName,
+          timeline: this.state.timeline,
+          playPause: this.state.playPause
+        }));
+      } else if (data.DataType === "applySync") {
+        console.log("received apply sync");
+        this.state.timeline = data.SyncTimeline.Timeline;
+        this.state.playPause = data.SyncPlayPause.PlayPause;
+        this.forceUpdate();
       } else {
         console.log(data["DataType"]);
         return;

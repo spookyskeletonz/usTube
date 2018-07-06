@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/gorilla/websocket"
 	"log"
 )
 
@@ -100,7 +101,7 @@ func receiveTimeline(dataUnmarshalled map[string]interface{}, room *Room) {
 	newTimeline := Timeline{
 		UserName: dataUnmarshalled["userName"].(string),
 		RoomName: dataUnmarshalled["roomName"].(string),
-		Timeline: dataUnmarshalled["timeline"].(float32),
+		Timeline: dataUnmarshalled["timeline"].(float64),
 	}
 	// Send the newly received message to message broadcast
 	room.TimelineBroadcast <- newTimeline
@@ -111,7 +112,7 @@ func receiveSync(dataUnmarshalled map[string]interface{}, room *Room) {
 	newTimeline := Timeline{
 		UserName: dataUnmarshalled["userName"].(string),
 		RoomName: dataUnmarshalled["roomName"].(string),
-		Timeline: dataUnmarshalled["timeline"].(float32),
+		Timeline: dataUnmarshalled["timeline"].(float64),
 	}
 	newPlayPause := PlayPause{
 		UserName:  dataUnmarshalled["userName"].(string),
@@ -127,7 +128,7 @@ func receiveSync(dataUnmarshalled map[string]interface{}, room *Room) {
 	room.SyncBroadcast <- newSync
 }
 
-func getSync(client *Conn, room *Room) {
+func getSync(client *websocket.Conn, room *Room) {
 	err := client.WriteJSON(struct {
 		DataType string
 	}{
@@ -141,11 +142,12 @@ func getSync(client *Conn, room *Room) {
 	}
 }
 
-func syncNewClient(room *Room, client *Conn) {
+func syncNewClient(room *Room, client *websocket.Conn) {
 	if len(room.Clients) == 0 {
+		log.Printf("no clients in room yet")
 		return
 	}
-	var prevClient *Conn
+	var prevClient *websocket.Conn
 	for conn := range room.Clients {
 		prevClient = conn
 		break
@@ -167,4 +169,5 @@ func syncNewClient(room *Room, client *Conn) {
 		client.Close()
 		delete(room.Clients, client)
 	}
+	return
 }

@@ -17,7 +17,7 @@ type PlayPause struct {
 type Timeline struct {
 	UserName string  `json:userName`
 	RoomName string  `json:roomName`
-	Timeline float32 `json:timeline`
+	Timeline float64 `json:timeline`
 }
 
 type Sync struct {
@@ -39,6 +39,7 @@ func newRoom(roomname string) Room {
 	messageBroadcast := make(chan Message)
 	playPauseBroadcast := make(chan PlayPause)
 	timelineBroadcast := make(chan Timeline)
+	syncBroadcast := make(chan Sync)
 
 	return Room{
 		RoomName:           roomname,
@@ -46,5 +47,6 @@ func newRoom(roomname string) Room {
 		MessageBroadcast:   messageBroadcast,
 		PlayPauseBroadcast: playPauseBroadcast,
 		TimelineBroadcast:  timelineBroadcast,
+		SyncBroadcast:      syncBroadcast,
 	}
 }
