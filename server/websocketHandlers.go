@@ -105,3 +105,66 @@ func receiveTimeline(dataUnmarshalled map[string]interface{}, room *Room) {
 	// Send the newly received message to message broadcast
 	room.TimelineBroadcast <- newTimeline
 }
+
+func receiveSync(dataUnmarshalled map[string]interface{}, room *Room) {
+	// use unmarshalled json map to create new Sync struct
+	newTimeline := Timeline{
+		UserName: dataUnmarshalled["userName"].(string),
+		RoomName: dataUnmarshalled["roomName"].(string),
+		Timeline: dataUnmarshalled["timeline"].(float32),
+	}
+	newPlayPause := PlayPause{
+		UserName:  dataUnmarshalled["userName"].(string),
+		RoomName:  dataUnmarshalled["roomName"].(string),
+		PlayPause: dataUnmarshalled["playPause"].(bool),
+	}
+
+	newSync := Sync{
+		SyncPlayPause: newPlayPause,
+		SyncTimeline:  newTimeline,
+	}
+
+	room.SyncBroadcast <- newSync
+}
+
+func getSync(client *Conn, room *Room) {
+	err := client.WriteJSON(struct {
+		DataType string
+	}{
+		DataType: "requestSync",
+	})
+
+	if err != nil {
+		log.Printf("error writing to client: %v", err)
+		client.Close()
+		delete(room.Clients, client)
+	}
+}
+
+func syncNewClient(room *Room, client *Conn) {
+	if len(room.Clients) == 0 {
+		return
+	}
+	var prevClient *Conn
+	for conn := range room.Clients {
+		prevClient = conn
+		break
+	}
+
+	// Get sync from already existing client
+	getSync(prevClient, room)
+	syncData := <-room.SyncBroadcast
+	// Now send it to every connected client
+	err := client.WriteJSON(struct {
+		DataType string
+		Sync
+	}{
+		DataType: "applySync",
+		Sync:     syncData,
+	})
+	if err != nil {
+		log.Printf("error writing to client : %v", err)
+		client.Close()
+		delete(room.Clients, client)
+	}
+}

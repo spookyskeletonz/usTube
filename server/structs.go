@@ -20,12 +20,18 @@ type Timeline struct {
 	Timeline float32 `json:timeline`
 }
 
+type Sync struct {
+	SyncPlayPause PlayPause
+	SyncTimeline  Timeline
+}
+
 type Room struct {
 	RoomName           string
 	Clients            map[*websocket.Conn]bool
 	MessageBroadcast   chan Message
 	PlayPauseBroadcast chan PlayPause
 	TimelineBroadcast  chan Timeline
+	SyncBroadcast      chan Sync
 }
 
 func newRoom(roomname string) Room {
