@@ -52,12 +52,7 @@ class App extends Component {
       );
     } else {
       appRender = (
-        <Grid textAlign='center' verticalAlign='middle' style={{ height: '100%' }}>
-          <Grid.Column computer={8} mobile={15} tablet={12}>
-            <header className='Title'><p>UsTube</p></header>
-            <Room userName={this.state.userName} roomName={this.state.roomName} />
-          </Grid.Column>
-        </Grid>
+        <Room userName={this.state.userName} roomName={this.state.roomName} />
       );
     }
 

@@ -18,6 +18,7 @@
     "browserify": "^16.2.2",
     "react": "^16.4.1",
     "react-dom": "^16.4.1",
+    "react-video-seek-slider": "^2.1.1",
     "semantic-ui-react": "^0.81.3"
   }
 }

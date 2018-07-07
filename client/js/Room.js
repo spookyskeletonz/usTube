@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import { Form, Button } from 'semantic-ui-react';
+import { Grid, Form, Button, Icon } from 'semantic-ui-react';
+import ChatBox from './ChatBox.js';
 
 class Room extends Component {
   constructor(props) {
@@ -11,7 +12,6 @@ class Room extends Component {
       input: ''
     }
     this.socket = new WebSocket('ws://' + window.location.host + '/ws?roomName='+this.props.roomName);
-    this.handleMessageSubmit = this.handleMessageSubmit.bind(this);
     this.handleInputChange = this.handleInputChange.bind(this);
     this.handlePlayPauseClick = this.handlePlayPauseClick.bind(this);
   }
@@ -19,8 +19,7 @@ class Room extends Component {
   onSocketMessage(message) {
     let data = JSON.parse(message.data);
     if(data.DataType === "message"){
-      console.log("received message");
-      this.state.messages.push(data);
+      this.refs.chatBox.onNewMessage(data);
     } else if(data.DataType === "playPause"){
       console.log("received playpause");
       this.state.playPause = data.PlayPause;
@@ -59,19 +58,6 @@ class Room extends Component {
     });
   }
 
-  handleMessageSubmit(event){
-    this.socket.send(JSON.stringify({
-      dataType: 'message',
-      userName: this.props.userName,
-      roomName: this.props.roomName,
-      message: this.state.input
-    }));
-    this.setState(
-    {
-      input: ''
-    });
-  }
-
   handlePlayPauseClick(event){
     this.socket.send(JSON.stringify({
       dataType: 'playPause',
@@ -83,17 +69,34 @@ class Room extends Component {
 
   render() {
     console.log(this.state.playPause);
+    let playPauseRender;
+    if(this.state.playPause) {
+      playPauseRender = (
+        <Button icon onClick={this.handlePlayPauseClick}><Icon name="pause" /></Button>
+      );
+    } else {
+      playPauseRender = (
+        <Button icon onClick={this.handlePlayPauseClick}><Icon name="play" /></Button>
+      );
+    }
+
     return (
       <div className='Room'>
-        <Form onSubmit={this.handleMessageSubmit}>
-          <Form.Group>
-            <Form.Field width={12}>
-              <input required placeholder='Write a message' name='input' value={this.state.input} onChange={this.handleInputChange}/>
-            </Form.Field>
-            <Form.Button width={4} color='green' type='submit'>Send</Form.Button>
-          </Form.Group>
-        </Form>
-        <Button onClick={this.handlePlayPauseClick}>{this.state.playPause ? 'pause' : 'play'}</Button>
+        <Grid textAlign='center' verticalAlign='middle' style={{ height: '100%' }}>
+          <Grid.Row columns={1}>
+            <Grid.Column>
+              <header className='Title'><p>UsTube</p></header>
+            </Grid.Column>
+          </Grid.Row>
+          <Grid.Row columns={2}>
+            <Grid.Column width={11}>
+              {playPauseRender}
+            </Grid.Column>
+            <Grid.Column width={4}>
+              <ChatBox ref="chatBox" roomName={this.props.roomName} userName={this.props.userName} socket={this.socket} />
+            </Grid.Column>
+          </Grid.Row>
+        </Grid>
       </div>
     );
   }
