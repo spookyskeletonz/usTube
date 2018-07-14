@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import { Grid, Form, Button, Icon } from 'semantic-ui-react';
+import { Grid, Form } from 'semantic-ui-react';
+import VideoPlayer from './VideoPlayer.js';
 import ChatBox from './ChatBox.js';
 
 class Room extends Component {
@@ -67,19 +68,16 @@ class Room extends Component {
     }));
   }
 
-  render() {
-    console.log(this.state.playPause);
-    let playPauseRender;
-    if(this.state.playPause) {
-      playPauseRender = (
-        <Button icon onClick={this.handlePlayPauseClick}><Icon name="pause" /></Button>
-      );
-    } else {
-      playPauseRender = (
-        <Button icon onClick={this.handlePlayPauseClick}><Icon name="play" /></Button>
-      );
-    }
+  handleTimelineChange(event){
+    this.socket.send(JSON.stringify({
+      dataType: 'timeline',
+      userName: this.props.userName,
+      roomName: this.props.roomName,
+      timeline: event.target.value
+    })) 
+  }
 
+  render() {
     return (
       <div className='Room'>
         <Grid textAlign='center' verticalAlign='middle' style={{ height: '100%' }}>
@@ -90,7 +88,9 @@ class Room extends Component {
           </Grid.Row>
           <Grid.Row columns={2}>
             <Grid.Column width={11}>
-              {playPauseRender}
+              <Grid>
+                <VideoPlayer handlePlayPauseClick={this.handlePlayPauseClick} playPause={this.state.playPause} timeline={this.state.timeline} />
+              </Grid>
             </Grid.Column>
             <Grid.Column width={4}>
               <ChatBox ref="chatBox" roomName={this.props.roomName} userName={this.props.userName} socket={this.socket} />
