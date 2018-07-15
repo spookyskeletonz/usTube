@@ -15,6 +15,12 @@ class Room extends Component {
     this.socket = new WebSocket('ws://' + window.location.host + '/ws?roomName='+this.props.roomName);
     this.handleInputChange = this.handleInputChange.bind(this);
     this.handlePlayPauseClick = this.handlePlayPauseClick.bind(this);
+    this.handleTimelineChange = this.handleTimelineChange.bind(this);
+    this.updateTimeline = this.updateTimeline.bind(this);
+  }
+
+  updateTimeline(newTime) {
+    this.state.timeline = newTime;
   }
 
   onSocketMessage(message) {
@@ -40,7 +46,6 @@ class Room extends Component {
       console.log("received apply sync");
       this.state.timeline = data.SyncTimeline.Timeline;
       this.state.playPause = data.SyncPlayPause.PlayPause;
-      this.forceUpdate();
     } else {
       console.log(data["DataType"]);
       return;
@@ -73,7 +78,7 @@ class Room extends Component {
       dataType: 'timeline',
       userName: this.props.userName,
       roomName: this.props.roomName,
-      timeline: event.target.value
+      timeline: parseFloat(event.target.value)
     })) 
   }
 
@@ -89,7 +94,7 @@ class Room extends Component {
           <Grid.Row columns={2}>
             <Grid.Column width={11}>
               <Grid>
-                <VideoPlayer handlePlayPauseClick={this.handlePlayPauseClick} playPause={this.state.playPause} timeline={this.state.timeline} />
+                <VideoPlayer updateTimeline={this.updateTimeline} handleTimelineChange={this.handleTimelineChange} handlePlayPauseClick={this.handlePlayPauseClick} playPause={this.state.playPause} timeline={this.state.timeline} />
               </Grid>
             </Grid.Column>
             <Grid.Column width={4}>

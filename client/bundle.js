@@ -468,10 +468,17 @@ var Room = function (_Component) {
     _this.socket = new WebSocket('ws://' + window.location.host + '/ws?roomName=' + _this.props.roomName);
     _this.handleInputChange = _this.handleInputChange.bind(_this);
     _this.handlePlayPauseClick = _this.handlePlayPauseClick.bind(_this);
+    _this.handleTimelineChange = _this.handleTimelineChange.bind(_this);
+    _this.updateTimeline = _this.updateTimeline.bind(_this);
     return _this;
   }
 
   _createClass(Room, [{
+    key: 'updateTimeline',
+    value: function updateTimeline(newTime) {
+      this.state.timeline = newTime;
+    }
+  }, {
     key: 'onSocketMessage',
     value: function onSocketMessage(message) {
       var data = JSON.parse(message.data);
@@ -496,7 +503,6 @@ var Room = function (_Component) {
         console.log("received apply sync");
         this.state.timeline = data.SyncTimeline.Timeline;
         this.state.playPause = data.SyncPlayPause.PlayPause;
-        this.forceUpdate();
       } else {
         console.log(data["DataType"]);
         return;
@@ -534,7 +540,7 @@ var Room = function (_Component) {
         dataType: 'timeline',
         userName: this.props.userName,
         roomName: this.props.roomName,
-        timeline: event.target.value
+        timeline: parseFloat(event.target.value)
       }));
     }
   }, {
@@ -572,7 +578,7 @@ var Room = function (_Component) {
               _react2.default.createElement(
                 _semanticUiReact.Grid,
                 null,
-                _react2.default.createElement(_VideoPlayer2.default, { handlePlayPauseClick: this.handlePlayPauseClick, playPause: this.state.playPause, timeline: this.state.timeline })
+                _react2.default.createElement(_VideoPlayer2.default, { updateTimeline: this.updateTimeline, handleTimelineChange: this.handleTimelineChange, handlePlayPauseClick: this.handlePlayPauseClick, playPause: this.state.playPause, timeline: this.state.timeline })
               )
             ),
             _react2.default.createElement(
@@ -627,10 +633,10 @@ var VideoPlayer = function (_Component) {
     var _this = _possibleConstructorReturn(this, (VideoPlayer.__proto__ || Object.getPrototypeOf(VideoPlayer)).call(this, props));
 
     _this.state = {
-      played: 0,
+      played: _this.props.timeline,
       seeking: false,
       url: "https://www.youtube.com/watch?v=4BSJAAo1uNY",
-      playing: true,
+      playing: _this.props.playPause,
       volume: 0.8,
       muted: false,
       loaded: 0,
@@ -651,6 +657,23 @@ var VideoPlayer = function (_Component) {
   }
 
   _createClass(VideoPlayer, [{
+    key: 'componentWillUpdate',
+    value: function componentWillUpdate(nextProps, nextState) {
+      console.log(nextProps);
+      console.log(nextState);
+    }
+  }, {
+    key: 'componentWillReceiveProps',
+    value: function componentWillReceiveProps(nextProps) {
+      if (nextProps.timeline !== this.state.played) this.setState({
+        played: nextProps.timeline
+      });
+      this.refs.player.seekTo(nextProps.timeline);
+      if (nextProps.playPause !== this.state.playing) this.setState({
+        playing: nextProps.playPause
+      });
+    }
+  }, {
     key: 'onPlay',
     value: function onPlay() {
       this.setState({
@@ -670,6 +693,7 @@ var VideoPlayer = function (_Component) {
       if (!this.state.seeking) {
         this.setState(state);
       }
+      this.props.updateTimeline(state.played);
     }
   }, {
     key: 'onDuration',
@@ -692,6 +716,7 @@ var VideoPlayer = function (_Component) {
         seeking: false
       });
       this.refs.player.seekTo(parseFloat(event.target.value));
+      this.props.handleTimelineChange(event);
     }
   }, {
     key: 'onSeekChange',

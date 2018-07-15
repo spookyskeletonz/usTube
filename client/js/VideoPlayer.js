@@ -6,10 +6,10 @@ class VideoPlayer extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      played: 0,
+      played: this.props.timeline,
       seeking: false,
       url: "https://www.youtube.com/watch?v=4BSJAAo1uNY",
-      playing: true,
+      playing: this.props.playPause,
       volume: 0.8,
       muted: false,
       loaded: 0,
@@ -27,7 +27,24 @@ class VideoPlayer extends Component {
     this.onProgress = this.onProgress.bind(this);
     this.onDuration = this.onDuration.bind(this);
   }
-  
+
+  componentWillUpdate(nextProps, nextState){
+    console.log(nextProps);
+    console.log(nextState);
+  }
+
+  componentWillReceiveProps(nextProps){
+    if(nextProps.timeline !== this.state.played)
+      this.setState({
+        played: nextProps.timeline
+      });
+      this.refs.player.seekTo(nextProps.timeline);
+    if(nextProps.playPause !== this.state.playing)
+      this.setState({
+        playing: nextProps.playPause
+      });
+  }
+
   onPlay(){
     this.setState({
       playing: true
@@ -44,6 +61,7 @@ class VideoPlayer extends Component {
     if(!this.state.seeking){
       this.setState(state);
     }
+    this.props.updateTimeline(state.played);
   }
 
   onDuration(newDuration){
@@ -62,7 +80,8 @@ class VideoPlayer extends Component {
     this.setState({
       seeking: false
     });
-    this.refs.player.seekTo(parseFloat(event.target.value))
+    this.refs.player.seekTo(parseFloat(event.target.value));
+    this.props.handleTimelineChange(event);
   }
 
   onSeekChange(event){
@@ -89,7 +108,7 @@ class VideoPlayer extends Component {
         <Button icon onClick={this.handlePlayPauseClick}><Icon name="play" /></Button>
       );
     }
-    
+
     return (
       <div className='VideoPlayer'>
         <Grid.Row centered>
