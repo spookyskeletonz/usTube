@@ -462,7 +462,6 @@ var Room = function (_Component) {
     _this.state = {
       playPause: false,
       timeline: 0.0,
-      messages: [],
       input: ''
     };
     _this.socket = new WebSocket('ws://' + window.location.host + '/ws?roomName=' + _this.props.roomName);
@@ -487,9 +486,11 @@ var Room = function (_Component) {
       } else if (data.DataType === "playPause") {
         console.log("received playpause");
         this.state.playPause = data.PlayPause;
+        this.forceUpdate();
       } else if (data.DataType === "timeline") {
         console.log("received timeline");
         this.state.timeline = data.Timeline;
+        this.forceUpdate();
       } else if (data.DataType === "requestSync") {
         console.log("received sync request");
         this.socket.send(JSON.stringify({
@@ -499,15 +500,16 @@ var Room = function (_Component) {
           timeline: this.state.timeline,
           playPause: this.state.playPause
         }));
+        this.forceUpdate();
       } else if (data.DataType === "applySync") {
         console.log("received apply sync");
         this.state.timeline = data.SyncTimeline.Timeline;
         this.state.playPause = data.SyncPlayPause.PlayPause;
+        this.forceUpdate();
       } else {
         console.log(data["DataType"]);
         return;
       }
-      this.forceUpdate();
     }
   }, {
     key: 'componentDidMount',
@@ -665,12 +667,12 @@ var VideoPlayer = function (_Component) {
   }, {
     key: 'componentWillReceiveProps',
     value: function componentWillReceiveProps(nextProps) {
-      if (nextProps.timeline !== this.state.played) this.setState({
+      if (nextProps.timeline !== this.state.played) {
+        this.refs.player.seekTo(nextProps.timeline);
+      }
+      this.setState({
+        playing: nextProps.playPause,
         played: nextProps.timeline
-      });
-      this.refs.player.seekTo(nextProps.timeline);
-      if (nextProps.playPause !== this.state.playing) this.setState({
-        playing: nextProps.playPause
       });
     }
   }, {
@@ -757,21 +759,36 @@ var VideoPlayer = function (_Component) {
         _react2.default.createElement(
           _semanticUiReact.Grid.Row,
           { centered: true },
-          _react2.default.createElement(_reactPlayer2.default, {
-            ref: 'player',
-            className: 'react-player',
-            width: '100%',
-            height: '100%',
-            url: this.state.url,
-            playing: this.state.playing,
-            loop: this.state.loop,
-            playbackRate: this.state.playbackRate,
-            muted: this.state.muted,
-            onPlay: this.onPlay,
-            onPause: this.onPause,
-            onProgress: this.onProgress,
-            onDuration: this.onDuration
-          })
+          _react2.default.createElement(
+            'div',
+            { className: 'Video' },
+            _react2.default.createElement(_reactPlayer2.default, {
+              ref: 'player',
+              className: 'react-player',
+              width: '100%',
+              height: '100%',
+              url: this.state.url,
+              playing: this.state.playing,
+              loop: this.state.loop,
+              playbackRate: this.state.playbackRate,
+              muted: this.state.muted,
+              onPlay: this.onPlay,
+              onPause: this.onPause,
+              onProgress: this.onProgress,
+              onDuration: this.onDuration,
+              config: {
+                youtube: {
+                  playerVars: {
+                    autoplay: 0,
+                    controls: 0,
+                    disablekb: 1,
+                    color: 'white',
+                    start: this.state.played * this.state.duration
+                  }
+                }
+              }
+            })
+          )
         ),
         _react2.default.createElement(
           _semanticUiReact.Grid.Row,

@@ -34,15 +34,13 @@ class VideoPlayer extends Component {
   }
 
   componentWillReceiveProps(nextProps){
-    if(nextProps.timeline !== this.state.played)
-      this.setState({
-        played: nextProps.timeline
-      });
+    if(nextProps.timeline !== this.state.played){
       this.refs.player.seekTo(nextProps.timeline);
-    if(nextProps.playPause !== this.state.playing)
-      this.setState({
-        playing: nextProps.playPause
-      });
+    }
+    this.setState({
+      playing: nextProps.playPause,
+      played: nextProps.timeline
+    });
   }
 
   onPlay(){
@@ -112,21 +110,34 @@ class VideoPlayer extends Component {
     return (
       <div className='VideoPlayer'>
         <Grid.Row centered>
-          <ReactPlayer
-              ref="player"
-              className='react-player'
-              width='100%'
-              height='100%'
-              url={this.state.url}
-              playing={this.state.playing}
-              loop={this.state.loop}
-              playbackRate={this.state.playbackRate}
-              muted={this.state.muted}
-              onPlay={this.onPlay}
-              onPause={this.onPause}
-              onProgress={this.onProgress}
-              onDuration={this.onDuration}
-          />
+          <div className='Video'>
+            <ReactPlayer
+                ref="player"
+                className='react-player'
+                width='100%'
+                height='100%'
+                url={this.state.url}
+                playing={this.state.playing}
+                loop={this.state.loop}
+                playbackRate={this.state.playbackRate}
+                muted={this.state.muted}
+                onPlay={this.onPlay}
+                onPause={this.onPause}
+                onProgress={this.onProgress}
+                onDuration={this.onDuration}
+                config={{
+                  youtube: {
+                    playerVars: {
+                      autoplay: 0,
+                      controls: 0,
+                      disablekb: 1,
+                      color: 'white',
+                      start: this.state.played * this.state.duration
+                    }
+                  }
+                }}
+            />
+          </div>
         </Grid.Row>
         <Grid.Row centered>
           {playPauseRender}

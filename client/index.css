@@ -15,6 +15,10 @@ body {
     max-height: 500px;
 }
 
+.Video {
+    pointer-events: none;
+}
+
 .Title {
     font-family: 'Poiret One', cursive;
     font-size: 80px;

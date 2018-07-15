@@ -9,7 +9,6 @@ class Room extends Component {
     this.state = {
       playPause: false,
       timeline: 0.0,
-      messages: [],
       input: ''
     }
     this.socket = new WebSocket('ws://' + window.location.host + '/ws?roomName='+this.props.roomName);
@@ -30,9 +29,11 @@ class Room extends Component {
     } else if(data.DataType === "playPause"){
       console.log("received playpause");
       this.state.playPause = data.PlayPause;
+      this.forceUpdate();
     } else if(data.DataType === "timeline") {
       console.log("received timeline");
       this.state.timeline = data.Timeline;
+      this.forceUpdate();
     } else if(data.DataType === "requestSync"){
       console.log("received sync request");
       this.socket.send(JSON.stringify({
@@ -42,15 +43,16 @@ class Room extends Component {
         timeline: this.state.timeline,
         playPause: this.state.playPause
       }));
+      this.forceUpdate();
     } else if (data.DataType === "applySync"){
       console.log("received apply sync");
       this.state.timeline = data.SyncTimeline.Timeline;
       this.state.playPause = data.SyncPlayPause.PlayPause;
+      this.forceUpdate();
     } else {
       console.log(data["DataType"]);
       return;
     }
-    this.forceUpdate();
   }
 
   componentDidMount() {
