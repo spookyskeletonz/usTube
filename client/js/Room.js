@@ -12,7 +12,6 @@ class Room extends Component {
       input: ''
     }
     this.socket = new WebSocket('ws://' + window.location.host + '/ws?roomName='+this.props.roomName);
-    this.handleInputChange = this.handleInputChange.bind(this);
     this.handlePlayPauseClick = this.handlePlayPauseClick.bind(this);
     this.handleTimelineChange = this.handleTimelineChange.bind(this);
     this.updateTimeline = this.updateTimeline.bind(this);
@@ -27,15 +26,14 @@ class Room extends Component {
     if(data.DataType === "message"){
       this.refs.chatBox.onNewMessage(data);
     } else if(data.DataType === "playPause"){
-      console.log("received playpause");
-      this.state.playPause = data.PlayPause;
-      this.forceUpdate();
+      this.setState({
+        playPause: data.PlayPause
+      });
     } else if(data.DataType === "timeline") {
-      console.log("received timeline");
-      this.state.timeline = data.Timeline;
-      this.forceUpdate();
+      this.setState({
+        timeline: data.Timeline
+      });
     } else if(data.DataType === "requestSync"){
-      console.log("received sync request");
       this.socket.send(JSON.stringify({
         dataType: 'sync',
         userName: this.props.userName,
@@ -44,13 +42,10 @@ class Room extends Component {
         playPause: this.state.playPause
       }));
     } else if (data.DataType === "applySync"){
-      console.log("received apply sync");
-      this.state.timeline = data.SyncTimeline.Timeline;
-      this.state.playPause = data.SyncPlayPause.PlayPause;
-      this.forceUpdate();
-    } else {
-      console.log(data["DataType"]);
-      return;
+      this.setState({
+        timeline: data.SyncTimeline.Timeline,
+        playPause: data.SyncPlayPause.PlayPause
+      });
     }
   }
 
@@ -58,14 +53,7 @@ class Room extends Component {
     this.socket.onmessage = (m) => this.onSocketMessage(m);
   }
 
-  handleInputChange(event) {
-    this.setState(
-    {
-      [event.target.name]: event.target.value
-    });
-  }
-
-  handlePlayPauseClick(event){
+  handlePlayPauseClick(){
     this.socket.send(JSON.stringify({
       dataType: 'playPause',
       userName: this.props.userName,

@@ -39,15 +39,29 @@ class VideoPlayer extends Component {
   }
 
   onPlay(){
-    this.setState({
-      playing: true
-    });
+    if(!this.state.playing){
+      this.setState({
+        playing: true
+      });
+      this.props.handlePlayPauseClick();
+    } else {
+      this.setState({
+        playing: true
+      });
+    }
   }
 
   onPause(){
-    this.setState({
-      playing: false
-    });
+    if(this.state.playing){
+      this.setState({
+        playing: false 
+      });
+      this.props.handlePlayPauseClick();
+    } else {
+      this.setState({
+        playing: false 
+      });
+    }   
   }
 
   onProgress(state){
@@ -89,12 +103,12 @@ class VideoPlayer extends Component {
     this.setState({
       playing: !this.state.playing
     })
-    this.props.handlePlayPauseClick(event);
+    this.props.handlePlayPauseClick();
   }
 
   render() {
     let playPauseRender;
-    if(this.props.playPause) {
+    if(this.state.playing) {
       playPauseRender = (
         <Button icon onClick={this.handlePlayPauseClick}><Icon name="pause" /></Button>
       );

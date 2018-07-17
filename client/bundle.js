@@ -443,8 +443,6 @@ var _ChatBox2 = _interopRequireDefault(_ChatBox);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
@@ -465,7 +463,6 @@ var Room = function (_Component) {
       input: ''
     };
     _this.socket = new WebSocket('ws://' + window.location.host + '/ws?roomName=' + _this.props.roomName);
-    _this.handleInputChange = _this.handleInputChange.bind(_this);
     _this.handlePlayPauseClick = _this.handlePlayPauseClick.bind(_this);
     _this.handleTimelineChange = _this.handleTimelineChange.bind(_this);
     _this.updateTimeline = _this.updateTimeline.bind(_this);
@@ -485,12 +482,14 @@ var Room = function (_Component) {
         this.refs.chatBox.onNewMessage(data);
       } else if (data.DataType === "playPause") {
         console.log("received playpause");
-        this.state.playPause = data.PlayPause;
-        this.forceUpdate();
+        this.setState({
+          playPause: data.PlayPause
+        });
       } else if (data.DataType === "timeline") {
         console.log("received timeline");
-        this.state.timeline = data.Timeline;
-        this.forceUpdate();
+        this.setState({
+          timeline: data.Timeline
+        });
       } else if (data.DataType === "requestSync") {
         console.log("received sync request");
         this.socket.send(JSON.stringify({
@@ -502,9 +501,12 @@ var Room = function (_Component) {
         }));
       } else if (data.DataType === "applySync") {
         console.log("received apply sync");
-        this.state.timeline = data.SyncTimeline.Timeline;
-        this.state.playPause = data.SyncPlayPause.PlayPause;
-        this.forceUpdate();
+        //this.state.timeline = data.SyncTimeline.Timeline;
+        //this.state.playPause = data.SyncPlayPause.PlayPause;
+        this.setState({
+          timeline: data.SyncTimeline.Timeline,
+          playPause: data.SyncPlayPause.PlayPause
+        });
       } else {
         console.log(data["DataType"]);
         return;
@@ -520,13 +522,8 @@ var Room = function (_Component) {
       };
     }
   }, {
-    key: 'handleInputChange',
-    value: function handleInputChange(event) {
-      this.setState(_defineProperty({}, event.target.name, event.target.value));
-    }
-  }, {
     key: 'handlePlayPauseClick',
-    value: function handlePlayPauseClick(event) {
+    value: function handlePlayPauseClick() {
       this.socket.send(JSON.stringify({
         dataType: 'playPause',
         userName: this.props.userName,
@@ -658,12 +655,6 @@ var VideoPlayer = function (_Component) {
   }
 
   _createClass(VideoPlayer, [{
-    key: 'componentWillUpdate',
-    value: function componentWillUpdate(nextProps, nextState) {
-      console.log(nextProps);
-      console.log(nextState);
-    }
-  }, {
     key: 'componentWillReceiveProps',
     value: function componentWillReceiveProps(nextProps) {
       if (nextProps.timeline !== this.state.played) {
@@ -673,30 +664,42 @@ var VideoPlayer = function (_Component) {
         playing: nextProps.playPause,
         played: nextProps.timeline
       });
-      console.log("synced timeline to played");
     }
   }, {
     key: 'onPlay',
     value: function onPlay() {
-      this.setState({
-        playing: true
-      });
+      if (!this.state.playing) {
+        this.setState({
+          playing: true
+        });
+        this.props.handlePlayPauseClick();
+      } else {
+        this.setState({
+          playing: true
+        });
+      }
     }
   }, {
     key: 'onPause',
     value: function onPause() {
-      this.setState({
-        playing: false
-      });
+      if (this.state.playing) {
+        this.setState({
+          playing: false
+        });
+        this.props.handlePlayPauseClick();
+      } else {
+        this.setState({
+          playing: false
+        });
+      }
     }
   }, {
     key: 'onProgress',
     value: function onProgress(state) {
       if (!this.state.seeking) {
-        console.log("state being set for progress");
-        console.log(state);
         // Ignore initial render state to avoid rerender to played: 0
         if (state.played !== 0) this.setState(state);
+        console.log(this.state.playing);
       }
       this.props.updateTimeline(state.played);
     }
@@ -736,13 +739,13 @@ var VideoPlayer = function (_Component) {
       this.setState({
         playing: !this.state.playing
       });
-      this.props.handlePlayPauseClick(event);
+      this.props.handlePlayPauseClick();
     }
   }, {
     key: 'render',
     value: function render() {
       var playPauseRender = void 0;
-      if (this.props.playPause) {
+      if (this.state.playing) {
         playPauseRender = _react2.default.createElement(
           _semanticUiReact.Button,
           { icon: true, onClick: this.handlePlayPauseClick },
