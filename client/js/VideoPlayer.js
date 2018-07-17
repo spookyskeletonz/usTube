@@ -110,55 +110,79 @@ class VideoPlayer extends Component {
     let playPauseRender;
     if(this.state.playing) {
       playPauseRender = (
-        <Button icon onClick={this.handlePlayPauseClick}><Icon name="pause" /></Button>
+        <Button size="huge" icon onClick={this.handlePlayPauseClick}><Icon name="pause" /></Button>
       );
     } else {
       playPauseRender = (
-        <Button icon onClick={this.handlePlayPauseClick}><Icon name="play" /></Button>
+        <Button size="huge" icon onClick={this.handlePlayPauseClick}><Icon name="play" /></Button>
       );
+    }
+
+    let durationFormatted;
+    let durationMinutes = Math.floor(this.state.duration / 60);
+    let durationSeconds = this.state.duration % 60;
+    if(durationSeconds > 9){
+      durationFormatted = durationMinutes.toString() + ":" + durationSeconds.toString();
+    } else {
+      durationFormatted = durationMinutes.toString() + ":0" + durationSeconds.toString();
+    }
+
+    let playedFormatted;
+    let playedMinutes = Math.floor((this.state.played * this.state.duration) / 60);
+    let playedSeconds = Math.floor((this.state.played * this.state.duration) % 60);
+    if(playedSeconds > 9){
+      playedFormatted = playedMinutes.toString() + ":" + playedSeconds.toString();
+    } else {
+      playedFormatted = playedMinutes.toString() + ":0" + playedSeconds.toString();
     }
 
     return (
       <div className='VideoPlayer'>
-        <Grid.Row centered>
           <div className='Video'>
             <ReactPlayer
-                ref="player"
-                className='react-player'
-                width='100%'
-                height='100%'
-                url={this.state.url}
-                playing={this.state.playing}
-                loop={this.state.loop}
-                playbackRate={this.state.playbackRate}
-                muted={this.state.muted}
-                onPlay={this.onPlay}
-                onPause={this.onPause}
-                onProgress={this.onProgress}
-                onDuration={this.onDuration}
-                config={{
-                  youtube: {
-                    playerVars: {
-                      autoplay: 0,
-                      controls: 0,
-                      disablekb: 1,
-                      color: 'white'
-                    }
+              ref="player"
+              className='react-player'
+              width='900px'
+              url={this.state.url}
+              playing={this.state.playing}
+              loop={this.state.loop}
+              playbackRate={this.state.playbackRate}
+              muted={this.state.muted}
+              onPlay={this.onPlay}
+              onPause={this.onPause}
+              onProgress={this.onProgress}
+              onDuration={this.onDuration}
+              config={{
+                youtube: {
+                  playerVars: {
+                    modestbranding: 1,
+                    origin: window.location.host,
+                    rel: 0,
+                    autoplay: 0,
+                    controls: 0,
+                    disablekb: 1,
+                    color: 'white'
                   }
-                }}
+                }
+              }}
             />
           </div>
-        </Grid.Row>
-        <Grid.Row centered>
-          {playPauseRender}
-          <input
-            type='range' min={0} max={1} step='any'
-            value={this.state.played}
-            onMouseDown={this.onSeekMouseDown}
-            onChange={this.onSeekChange}
-            onMouseUp={this.onSeekMouseUp}
-          />
-        </Grid.Row>
+          <Grid.Row centered>
+            <Grid.Column>
+              {playPauseRender}
+              {playedFormatted}
+              <input
+                name="timeline"
+                style={{width: "500px"}}
+                type='range' min={0} max={1} step='any'
+                value={this.state.played}
+                onMouseDown={this.onSeekMouseDown}
+                onChange={this.onSeekChange}
+                onMouseUp={this.onSeekMouseUp}
+              />
+              {durationFormatted}
+            </Grid.Column>
+          </Grid.Row>
       </div>
     );
   }

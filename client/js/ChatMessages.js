@@ -17,7 +17,6 @@ class ChatMessages extends Component {
 
   onNewMessage(messageData) {
     this.state.messages.push(messageData);
-    console.log(messageData);
     this.forceUpdate();
   }
 

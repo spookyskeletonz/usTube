@@ -250,7 +250,6 @@ var ChatInput = function (_Component) {
   }, {
     key: 'handleSubmit',
     value: function handleSubmit(event) {
-      console.log(this.state.input);
       this.props.socket.send(JSON.stringify({
         dataType: 'message',
         userName: this.props.userName,
@@ -337,7 +336,6 @@ var ChatMessages = function (_Component) {
     key: 'onNewMessage',
     value: function onNewMessage(messageData) {
       this.state.messages.push(messageData);
-      console.log(messageData);
       this.forceUpdate();
     }
   }, {
@@ -481,17 +479,14 @@ var Room = function (_Component) {
       if (data.DataType === "message") {
         this.refs.chatBox.onNewMessage(data);
       } else if (data.DataType === "playPause") {
-        console.log("received playpause");
         this.setState({
           playPause: data.PlayPause
         });
       } else if (data.DataType === "timeline") {
-        console.log("received timeline");
         this.setState({
           timeline: data.Timeline
         });
       } else if (data.DataType === "requestSync") {
-        console.log("received sync request");
         this.socket.send(JSON.stringify({
           dataType: 'sync',
           userName: this.props.userName,
@@ -500,16 +495,10 @@ var Room = function (_Component) {
           playPause: this.state.playPause
         }));
       } else if (data.DataType === "applySync") {
-        console.log("received apply sync");
-        //this.state.timeline = data.SyncTimeline.Timeline;
-        //this.state.playPause = data.SyncPlayPause.PlayPause;
         this.setState({
           timeline: data.SyncTimeline.Timeline,
           playPause: data.SyncPlayPause.PlayPause
         });
-      } else {
-        console.log(data["DataType"]);
-        return;
       }
     }
   }, {
@@ -549,7 +538,7 @@ var Room = function (_Component) {
         { className: 'Room' },
         _react2.default.createElement(
           _semanticUiReact.Grid,
-          { textAlign: 'center', verticalAlign: 'middle', style: { height: '100%' } },
+          { textAlign: 'center', style: { height: '100%' } },
           _react2.default.createElement(
             _semanticUiReact.Grid.Row,
             { columns: 1 },
@@ -575,7 +564,7 @@ var Room = function (_Component) {
               { width: 11 },
               _react2.default.createElement(
                 _semanticUiReact.Grid,
-                null,
+                { textAlign: 'center' },
                 _react2.default.createElement(_VideoPlayer2.default, { updateTimeline: this.updateTimeline, handleTimelineChange: this.handleTimelineChange, handlePlayPauseClick: this.handlePlayPauseClick, playPause: this.state.playPause, timeline: this.state.timeline })
               )
             ),
@@ -699,7 +688,6 @@ var VideoPlayer = function (_Component) {
       if (!this.state.seeking) {
         // Ignore initial render state to avoid rerender to played: 0
         if (state.played !== 0) this.setState(state);
-        console.log(this.state.playing);
       }
       this.props.updateTimeline(state.played);
     }
@@ -748,64 +736,88 @@ var VideoPlayer = function (_Component) {
       if (this.state.playing) {
         playPauseRender = _react2.default.createElement(
           _semanticUiReact.Button,
-          { icon: true, onClick: this.handlePlayPauseClick },
+          { size: 'huge', icon: true, onClick: this.handlePlayPauseClick },
           _react2.default.createElement(_semanticUiReact.Icon, { name: 'pause' })
         );
       } else {
         playPauseRender = _react2.default.createElement(
           _semanticUiReact.Button,
-          { icon: true, onClick: this.handlePlayPauseClick },
+          { size: 'huge', icon: true, onClick: this.handlePlayPauseClick },
           _react2.default.createElement(_semanticUiReact.Icon, { name: 'play' })
         );
+      }
+
+      var durationFormatted = void 0;
+      var durationMinutes = Math.floor(this.state.duration / 60);
+      var durationSeconds = this.state.duration % 60;
+      if (durationSeconds > 9) {
+        durationFormatted = durationMinutes.toString() + ":" + durationSeconds.toString();
+      } else {
+        durationFormatted = durationMinutes.toString() + ":0" + durationSeconds.toString();
+      }
+
+      var playedFormatted = void 0;
+      var playedMinutes = Math.floor(this.state.played * this.state.duration / 60);
+      var playedSeconds = Math.floor(this.state.played * this.state.duration % 60);
+      if (playedSeconds > 9) {
+        playedFormatted = playedMinutes.toString() + ":" + playedSeconds.toString();
+      } else {
+        playedFormatted = playedMinutes.toString() + ":0" + playedSeconds.toString();
       }
 
       return _react2.default.createElement(
         'div',
         { className: 'VideoPlayer' },
         _react2.default.createElement(
-          _semanticUiReact.Grid.Row,
-          { centered: true },
-          _react2.default.createElement(
-            'div',
-            { className: 'Video' },
-            _react2.default.createElement(_reactPlayer2.default, {
-              ref: 'player',
-              className: 'react-player',
-              width: '100%',
-              height: '100%',
-              url: this.state.url,
-              playing: this.state.playing,
-              loop: this.state.loop,
-              playbackRate: this.state.playbackRate,
-              muted: this.state.muted,
-              onPlay: this.onPlay,
-              onPause: this.onPause,
-              onProgress: this.onProgress,
-              onDuration: this.onDuration,
-              config: {
-                youtube: {
-                  playerVars: {
-                    autoplay: 0,
-                    controls: 0,
-                    disablekb: 1,
-                    color: 'white'
-                  }
+          'div',
+          { className: 'Video' },
+          _react2.default.createElement(_reactPlayer2.default, {
+            ref: 'player',
+            className: 'react-player',
+            width: '900px',
+            url: this.state.url,
+            playing: this.state.playing,
+            loop: this.state.loop,
+            playbackRate: this.state.playbackRate,
+            muted: this.state.muted,
+            onPlay: this.onPlay,
+            onPause: this.onPause,
+            onProgress: this.onProgress,
+            onDuration: this.onDuration,
+            config: {
+              youtube: {
+                playerVars: {
+                  modestbranding: 1,
+                  origin: window.location.host,
+                  rel: 0,
+                  autoplay: 0,
+                  controls: 0,
+                  disablekb: 1,
+                  color: 'white'
                 }
               }
-            })
-          )
+            }
+          })
         ),
         _react2.default.createElement(
           _semanticUiReact.Grid.Row,
           { centered: true },
-          playPauseRender,
-          _react2.default.createElement('input', {
-            type: 'range', min: 0, max: 1, step: 'any',
-            value: this.state.played,
-            onMouseDown: this.onSeekMouseDown,
-            onChange: this.onSeekChange,
-            onMouseUp: this.onSeekMouseUp
-          })
+          _react2.default.createElement(
+            _semanticUiReact.Grid.Column,
+            null,
+            playPauseRender,
+            playedFormatted,
+            _react2.default.createElement('input', {
+              name: 'timeline',
+              style: { width: "500px" },
+              type: 'range', min: 0, max: 1, step: 'any',
+              value: this.state.played,
+              onMouseDown: this.onSeekMouseDown,
+              onChange: this.onSeekChange,
+              onMouseUp: this.onSeekMouseUp
+            }),
+            durationFormatted
+          )
         )
       );
     }

@@ -22,7 +22,6 @@ class ChatInput extends Component {
   }
 
   handleSubmit(event) {
-    console.log(this.state.input);
     this.props.socket.send(JSON.stringify({
       dataType: 'message',
       userName: this.props.userName,

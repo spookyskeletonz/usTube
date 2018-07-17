@@ -74,7 +74,7 @@ class Room extends Component {
   render() {
     return (
       <div className='Room'>
-        <Grid textAlign='center' verticalAlign='middle' style={{ height: '100%' }}>
+        <Grid textAlign='center' style={{ height: '100%' }}>
           <Grid.Row columns={1}>
             <Grid.Column>
               <header className='Title'><p>UsTube</p></header>
@@ -82,7 +82,7 @@ class Room extends Component {
           </Grid.Row>
           <Grid.Row columns={2}>
             <Grid.Column width={11}>
-              <Grid>
+              <Grid textAlign='center'>
                 <VideoPlayer updateTimeline={this.updateTimeline} handleTimelineChange={this.handleTimelineChange} handlePlayPauseClick={this.handlePlayPauseClick} playPause={this.state.playPause} timeline={this.state.timeline} />
               </Grid>
             </Grid.Column>
