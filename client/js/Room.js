@@ -43,7 +43,6 @@ class Room extends Component {
         timeline: this.state.timeline,
         playPause: this.state.playPause
       }));
-      this.forceUpdate();
     } else if (data.DataType === "applySync"){
       console.log("received apply sync");
       this.state.timeline = data.SyncTimeline.Timeline;

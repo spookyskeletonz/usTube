@@ -500,7 +500,6 @@ var Room = function (_Component) {
           timeline: this.state.timeline,
           playPause: this.state.playPause
         }));
-        this.forceUpdate();
       } else if (data.DataType === "applySync") {
         console.log("received apply sync");
         this.state.timeline = data.SyncTimeline.Timeline;
@@ -674,6 +673,7 @@ var VideoPlayer = function (_Component) {
         playing: nextProps.playPause,
         played: nextProps.timeline
       });
+      console.log("synced timeline to played");
     }
   }, {
     key: 'onPlay',
@@ -693,7 +693,10 @@ var VideoPlayer = function (_Component) {
     key: 'onProgress',
     value: function onProgress(state) {
       if (!this.state.seeking) {
-        this.setState(state);
+        console.log("state being set for progress");
+        console.log(state);
+        // Ignore initial render state to avoid rerender to played: 0
+        if (state.played !== 0) this.setState(state);
       }
       this.props.updateTimeline(state.played);
     }
@@ -782,8 +785,7 @@ var VideoPlayer = function (_Component) {
                     autoplay: 0,
                     controls: 0,
                     disablekb: 1,
-                    color: 'white',
-                    start: this.state.played * this.state.duration
+                    color: 'white'
                   }
                 }
               }

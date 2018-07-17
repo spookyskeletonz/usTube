@@ -28,11 +28,6 @@ class VideoPlayer extends Component {
     this.onDuration = this.onDuration.bind(this);
   }
 
-  componentWillUpdate(nextProps, nextState){
-    console.log(nextProps);
-    console.log(nextState);
-  }
-
   componentWillReceiveProps(nextProps){
     if(nextProps.timeline !== this.state.played){
       this.refs.player.seekTo(nextProps.timeline);
@@ -57,7 +52,9 @@ class VideoPlayer extends Component {
 
   onProgress(state){
     if(!this.state.seeking){
-      this.setState(state);
+      // Ignore initial render state to avoid rerender to played: 0
+      if(state.played !== 0)
+        this.setState(state);
     }
     this.props.updateTimeline(state.played);
   }
@@ -131,8 +128,7 @@ class VideoPlayer extends Component {
                       autoplay: 0,
                       controls: 0,
                       disablekb: 1,
-                      color: 'white',
-                      start: this.state.played * this.state.duration
+                      color: 'white'
                     }
                   }
                 }}
