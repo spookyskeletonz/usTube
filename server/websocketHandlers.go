@@ -74,6 +74,30 @@ func broadcastTimeline(room *Room) {
 	}
 }
 
+func broadcastUrl(room *Room) {
+	for {
+		// Grab next Url change from our play pause broadcast
+		url := <-room.UrlBroadcast
+		// Now send it to every connected client
+		for client := range room.Clients {
+			// Here we are sending the struct as well as adding a field specifiying data type
+			err := client.WriteJSON(struct {
+				DataType string
+				Url
+			}{
+				DataType: "url",
+				Url:      url,
+			})
+			if err != nil {
+				log.Printf("error writing to client: %v", err)
+				client.Close()
+				delete(room.Clients, client)
+			}
+			log.Printf("broadcastUrl to client")
+		}
+	}
+}
+
 func receiveMessage(dataUnmarshalled map[string]interface{}, room *Room) {
 	// Use unmarshalled json map to create new Message
 	newMessage := Message{
@@ -92,7 +116,7 @@ func receivePlayPause(dataUnmarshalled map[string]interface{}, room *Room) {
 		RoomName:  dataUnmarshalled["roomName"].(string),
 		PlayPause: dataUnmarshalled["playPause"].(bool),
 	}
-	// Send the newly received message to message broadcast
+	// Send the newly received playpause to message broadcast
 	room.PlayPauseBroadcast <- newPlayPause
 }
 
@@ -103,7 +127,7 @@ func receiveTimeline(dataUnmarshalled map[string]interface{}, room *Room) {
 		RoomName: dataUnmarshalled["roomName"].(string),
 		Timeline: dataUnmarshalled["timeline"].(float64),
 	}
-	// Send the newly received message to message broadcast
+	// Send the newly received timeline to message broadcast
 	room.TimelineBroadcast <- newTimeline
 }
 
@@ -119,13 +143,32 @@ func receiveSync(dataUnmarshalled map[string]interface{}, room *Room) {
 		RoomName:  dataUnmarshalled["roomName"].(string),
 		PlayPause: dataUnmarshalled["playPause"].(bool),
 	}
+	newUrl := Url{
+		UserName: dataUnmarshalled["userName"].(string),
+		RoomName: dataUnmarshalled["roomName"].(string),
+		Url:      dataUnmarshalled["url"].(string),
+	}
 
 	newSync := Sync{
 		SyncPlayPause: newPlayPause,
 		SyncTimeline:  newTimeline,
+		SyncUrl:       newUrl,
 	}
 
 	room.SyncBroadcast <- newSync
+}
+
+func receiveUrl(dataUnmarshalled map[string]interface{}, room *Room) {
+	log.Printf("received URL from client")
+	// Use unmarshalled json map to create new Timeline
+	newUrl := Url{
+		UserName: dataUnmarshalled["userName"].(string),
+		RoomName: dataUnmarshalled["roomName"].(string),
+		Url:      dataUnmarshalled["url"].(string),
+	}
+	// Send the newly received url to message broadcast
+	room.UrlBroadcast <- newUrl
+
 }
 
 func getSync(client *websocket.Conn, room *Room) {

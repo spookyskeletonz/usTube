@@ -59,6 +59,7 @@ func handleConnections(w http.ResponseWriter, r *http.Request) {
 		go broadcastMessages(room)
 		go broadcastPlayPause(room)
 		go broadcastTimeline(room)
+		go broadcastUrl(room)
 	}
 
 	// first sync up new client with other clients before adding to room
@@ -88,6 +89,8 @@ func handleConnections(w http.ResponseWriter, r *http.Request) {
 			receivePlayPause(dataUnmarshalled, room)
 		case "timeline":
 			receiveTimeline(dataUnmarshalled, room)
+		case "url":
+			receiveUrl(dataUnmarshalled, room)
 		case "sync":
 			receiveSync(dataUnmarshalled, room)
 		}

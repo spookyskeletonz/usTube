@@ -8,7 +8,7 @@ class VideoPlayer extends Component {
     this.state = {
       played: this.props.timeline,
       seeking: false,
-      url: "https://www.youtube.com/watch?v=4BSJAAo1uNY",
+      url: this.props.url,
       playing: this.props.playPause,
       volume: 0.8,
       muted: false,
@@ -33,6 +33,7 @@ class VideoPlayer extends Component {
       this.refs.player.seekTo(nextProps.timeline);
     }
     this.setState({
+      url: nextProps.url,
       playing: nextProps.playPause,
       played: nextProps.timeline
     });
@@ -120,7 +121,7 @@ class VideoPlayer extends Component {
 
     let durationFormatted;
     let durationMinutes = Math.floor(this.state.duration / 60);
-    let durationSeconds = this.state.duration % 60;
+    let durationSeconds = Math.floor(this.state.duration % 60);
     if(durationSeconds > 9){
       durationFormatted = durationMinutes.toString() + ":" + durationSeconds.toString();
     } else {
@@ -155,6 +156,7 @@ class VideoPlayer extends Component {
               config={{
                 youtube: {
                   playerVars: {
+                    start: (this.state.played * this.state.duration),
                     modestbranding: 1,
                     origin: window.location.host,
                     rel: 0,

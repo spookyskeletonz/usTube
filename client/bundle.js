@@ -458,11 +458,12 @@ var Room = function (_Component) {
     _this.state = {
       playPause: false,
       timeline: 0.0,
-      input: ''
+      url: "https://www.youtube.com/watch?v=4BSJAAo1uNY"
     };
     _this.socket = new WebSocket('ws://' + window.location.host + '/ws?roomName=' + _this.props.roomName);
     _this.handlePlayPauseClick = _this.handlePlayPauseClick.bind(_this);
     _this.handleTimelineChange = _this.handleTimelineChange.bind(_this);
+    _this.handleUrlChange = _this.handleUrlChange.bind(_this);
     _this.updateTimeline = _this.updateTimeline.bind(_this);
     return _this;
   }
@@ -486,18 +487,25 @@ var Room = function (_Component) {
         this.setState({
           timeline: data.Timeline
         });
+      } else if (data.DataType === "url") {
+        console.log("received url");
+        this.setState({
+          url: data.Url
+        });
       } else if (data.DataType === "requestSync") {
         this.socket.send(JSON.stringify({
           dataType: 'sync',
           userName: this.props.userName,
           roomName: this.props.roomName,
           timeline: this.state.timeline,
-          playPause: this.state.playPause
+          playPause: this.state.playPause,
+          url: this.state.url
         }));
       } else if (data.DataType === "applySync") {
         this.setState({
           timeline: data.SyncTimeline.Timeline,
-          playPause: data.SyncPlayPause.PlayPause
+          playPause: data.SyncPlayPause.PlayPause,
+          url: data.SyncUrl.Url
         });
       }
     }
@@ -529,6 +537,19 @@ var Room = function (_Component) {
         roomName: this.props.roomName,
         timeline: parseFloat(event.target.value)
       }));
+    }
+  }, {
+    key: 'handleUrlChange',
+    value: function handleUrlChange(event) {
+      event.preventDefault();
+      var data = new FormData(event.target);
+      this.socket.send(JSON.stringify({
+        dataType: 'url',
+        userName: this.props.userName,
+        roomName: this.props.roomName,
+        url: "https://www.youtube.com/watch?v=" + data.get("url")
+      }));
+      console.log("sent url");
     }
   }, {
     key: 'render',
@@ -565,7 +586,30 @@ var Room = function (_Component) {
               _react2.default.createElement(
                 _semanticUiReact.Grid,
                 { textAlign: 'center' },
-                _react2.default.createElement(_VideoPlayer2.default, { updateTimeline: this.updateTimeline, handleTimelineChange: this.handleTimelineChange, handlePlayPauseClick: this.handlePlayPauseClick, playPause: this.state.playPause, timeline: this.state.timeline })
+                _react2.default.createElement(_VideoPlayer2.default, { updateTimeline: this.updateTimeline, handleTimelineChange: this.handleTimelineChange, handlePlayPauseClick: this.handlePlayPauseClick, playPause: this.state.playPause, timeline: this.state.timeline, url: this.state.url })
+              ),
+              _react2.default.createElement('p', null),
+              _react2.default.createElement(
+                _semanticUiReact.Segment,
+                null,
+                _react2.default.createElement(
+                  _semanticUiReact.Form,
+                  { onSubmit: this.handleUrlChange },
+                  _react2.default.createElement(
+                    _semanticUiReact.Form.Group,
+                    { inline: true },
+                    _react2.default.createElement(
+                      _semanticUiReact.Form.Field,
+                      null,
+                      _react2.default.createElement(_semanticUiReact.Input, { name: 'url', id: 'url', required: true, label: 'youtube.com/watch?v=', labelPosition: 'left' })
+                    ),
+                    _react2.default.createElement(
+                      _semanticUiReact.Button,
+                      { color: 'blue', type: 'submit', fluid: true, size: 'large' },
+                      'Watch'
+                    )
+                  )
+                )
               )
             ),
             _react2.default.createElement(
@@ -622,7 +666,7 @@ var VideoPlayer = function (_Component) {
     _this.state = {
       played: _this.props.timeline,
       seeking: false,
-      url: "https://www.youtube.com/watch?v=4BSJAAo1uNY",
+      url: _this.props.url,
       playing: _this.props.playPause,
       volume: 0.8,
       muted: false,
@@ -650,6 +694,7 @@ var VideoPlayer = function (_Component) {
         this.refs.player.seekTo(nextProps.timeline);
       }
       this.setState({
+        url: nextProps.url,
         playing: nextProps.playPause,
         played: nextProps.timeline
       });
@@ -749,7 +794,7 @@ var VideoPlayer = function (_Component) {
 
       var durationFormatted = void 0;
       var durationMinutes = Math.floor(this.state.duration / 60);
-      var durationSeconds = this.state.duration % 60;
+      var durationSeconds = Math.floor(this.state.duration % 60);
       if (durationSeconds > 9) {
         durationFormatted = durationMinutes.toString() + ":" + durationSeconds.toString();
       } else {
@@ -787,6 +832,7 @@ var VideoPlayer = function (_Component) {
             config: {
               youtube: {
                 playerVars: {
+                  start: this.state.played * this.state.duration,
                   modestbranding: 1,
                   origin: window.location.host,
                   rel: 0,
