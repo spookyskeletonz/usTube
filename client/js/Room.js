@@ -102,17 +102,17 @@ class Room extends Component {
           </Grid.Row>
           <Grid.Row columns={2}>
             <Grid.Column width={11}>
-              <Grid textAlign='center'>
+              <Segment raise>
                 <VideoPlayer updateTimeline={this.updateTimeline} handleTimelineChange={this.handleTimelineChange} handlePlayPauseClick={this.handlePlayPauseClick} playPause={this.state.playPause} timeline={this.state.timeline} url={this.state.url} />
-              </Grid>
+              </Segment>
               <p />
-              <Segment>
+              <Segment raised>
                 <Form onSubmit={this.handleUrlChange}>
                   <Form.Group inline>
                     <Form.Field>
                       <Input name="url" id="url" required label="youtube.com/watch?v=" labelPosition="left"/>
                     </Form.Field>
-                    <Button color="blue" type="submit" fluid size="large">Watch</Button>
+                    <Button color="blue" type="submit" fluid size="medium">Watch</Button>
                   </Form.Group> 
                 </Form>
               </Segment>

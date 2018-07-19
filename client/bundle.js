@@ -584,14 +584,14 @@ var Room = function (_Component) {
               _semanticUiReact.Grid.Column,
               { width: 11 },
               _react2.default.createElement(
-                _semanticUiReact.Grid,
-                { textAlign: 'center' },
+                _semanticUiReact.Segment,
+                { raise: true },
                 _react2.default.createElement(_VideoPlayer2.default, { updateTimeline: this.updateTimeline, handleTimelineChange: this.handleTimelineChange, handlePlayPauseClick: this.handlePlayPauseClick, playPause: this.state.playPause, timeline: this.state.timeline, url: this.state.url })
               ),
               _react2.default.createElement('p', null),
               _react2.default.createElement(
                 _semanticUiReact.Segment,
-                null,
+                { raised: true },
                 _react2.default.createElement(
                   _semanticUiReact.Form,
                   { onSubmit: this.handleUrlChange },
@@ -605,7 +605,7 @@ var Room = function (_Component) {
                     ),
                     _react2.default.createElement(
                       _semanticUiReact.Button,
-                      { color: 'blue', type: 'submit', fluid: true, size: 'large' },
+                      { color: 'blue', type: 'submit', fluid: true, size: 'medium' },
                       'Watch'
                     )
                   )
@@ -819,7 +819,7 @@ var VideoPlayer = function (_Component) {
           _react2.default.createElement(_reactPlayer2.default, {
             ref: 'player',
             className: 'react-player',
-            width: '900px',
+            width: '100%',
             url: this.state.url,
             playing: this.state.playing,
             loop: this.state.loop,
@@ -845,26 +845,18 @@ var VideoPlayer = function (_Component) {
             }
           })
         ),
-        _react2.default.createElement(
-          _semanticUiReact.Grid.Row,
-          { centered: true },
-          _react2.default.createElement(
-            _semanticUiReact.Grid.Column,
-            null,
-            playPauseRender,
-            playedFormatted,
-            _react2.default.createElement('input', {
-              name: 'timeline',
-              style: { width: "500px" },
-              type: 'range', min: 0, max: 1, step: 'any',
-              value: this.state.played,
-              onMouseDown: this.onSeekMouseDown,
-              onChange: this.onSeekChange,
-              onMouseUp: this.onSeekMouseUp
-            }),
-            durationFormatted
-          )
-        )
+        playPauseRender,
+        playedFormatted,
+        _react2.default.createElement('input', {
+          name: 'timeline',
+          style: { width: "80%" },
+          type: 'range', min: 0, max: 1, step: 'any',
+          value: this.state.played,
+          onMouseDown: this.onSeekMouseDown,
+          onChange: this.onSeekChange,
+          onMouseUp: this.onSeekMouseUp
+        }),
+        durationFormatted
       );
     }
   }]);

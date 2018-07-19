@@ -139,52 +139,48 @@ class VideoPlayer extends Component {
 
     return (
       <div className='VideoPlayer'>
-          <div className='Video'>
-            <ReactPlayer
-              ref="player"
-              className='react-player'
-              width='900px'
-              url={this.state.url}
-              playing={this.state.playing}
-              loop={this.state.loop}
-              playbackRate={this.state.playbackRate}
-              muted={this.state.muted}
-              onPlay={this.onPlay}
-              onPause={this.onPause}
-              onProgress={this.onProgress}
-              onDuration={this.onDuration}
-              config={{
-                youtube: {
-                  playerVars: {
-                    start: (this.state.played * this.state.duration),
-                    modestbranding: 1,
-                    origin: window.location.host,
-                    rel: 0,
-                    autoplay: 0,
-                    controls: 0,
-                    disablekb: 1,
-                    color: 'white'
-                  }
+        <div className='Video'>
+          <ReactPlayer
+            ref="player"
+            className='react-player'
+            width='100%'
+            url={this.state.url}
+            playing={this.state.playing}
+            loop={this.state.loop}
+            playbackRate={this.state.playbackRate}
+            muted={this.state.muted}
+            onPlay={this.onPlay}
+            onPause={this.onPause}
+            onProgress={this.onProgress}
+            onDuration={this.onDuration}
+            config={{
+              youtube: {
+                playerVars: {
+                  start: (this.state.played * this.state.duration),
+                  modestbranding: 1,
+                  origin: window.location.host,
+                  rel: 0,
+                  autoplay: 0,
+                  controls: 0,
+                  disablekb: 1,
+                  color: 'white'
                 }
-              }}
-            />
-          </div>
-          <Grid.Row centered>
-            <Grid.Column>
-              {playPauseRender}
-              {playedFormatted}
-              <input
-                name="timeline"
-                style={{width: "500px"}}
-                type='range' min={0} max={1} step='any'
-                value={this.state.played}
-                onMouseDown={this.onSeekMouseDown}
-                onChange={this.onSeekChange}
-                onMouseUp={this.onSeekMouseUp}
-              />
-              {durationFormatted}
-            </Grid.Column>
-          </Grid.Row>
+              }
+            }}
+          />
+        </div>
+        {playPauseRender}
+        {playedFormatted}
+        <input
+          name="timeline"
+          style={{width: "80%"}}
+          type='range' min={0} max={1} step='any'
+          value={this.state.played}
+          onMouseDown={this.onSeekMouseDown}
+          onChange={this.onSeekChange}
+          onMouseUp={this.onSeekMouseUp}
+        />
+        {durationFormatted}
       </div>
     );
   }
