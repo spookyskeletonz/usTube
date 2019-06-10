@@ -3,4 +3,8 @@ a synchronised youtube application, wherein each room contains users watching th
 
 written in golang(server)/reactJS(client)
 
-live at: http://ustube.ap-southeast-2.elasticbeanstalk.com/ 
+## Running Instructions
+run `sh run.sh`
+app will be live at localhost:5000
+
+Demo running at: http://ustube.ap-southeast-2.elasticbeanstalk.com/ 
