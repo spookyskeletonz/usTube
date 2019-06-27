@@ -22,8 +22,8 @@ func main() {
 	http.Handle("/", fs)
 	http.HandleFunc("/ws", handleConnections)
 
-	log.Println("http server starting on :5000")
-	err := http.ListenAndServe(":5000", nil)
+	log.Println("http server starting on :5002")
+	err := http.ListenAndServe(":5002", nil)
 	if err != nil {
 		log.Fatal("ListenAndServe: ", err)
 	}

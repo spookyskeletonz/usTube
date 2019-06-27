@@ -1,4 +1,3 @@
-unset GOROOT
 GOPATH=${GOPATH}:$(cd $(dirname $0); pwd)
 echo '$' export GOPATH=${GOPATH}
 
